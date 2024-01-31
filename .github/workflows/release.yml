@@ -1,0 +1,13 @@
+name: release
+
+on:
+  push:
+    tags:
+    - "v*"
+
+jobs:
+  release:
+    uses: nzbgetcom/nzbget-extensions/.github/workflows/extension-release.yml@main
+    with:
+      release-file-list: ExtendedUnrar.py
+      release-file-name: extendedUnrar
