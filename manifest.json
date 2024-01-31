@@ -1,0 +1,51 @@
+{
+    "main": "main.py",
+    "name": "ExtendedUnrar",
+    "homepage": "https://github.com/nzbgetcom/Extension-ExtendedUnrar",
+    "kind": "POST-PROCESSING",
+    "displayName": "Extended Unrar",
+    "version": "2.0.0",
+    "author": "thorli",
+    "license": "GNU",
+    "about": "Unrars nested rar files.",
+    "queueEvents": "",
+    "requirements": [
+        "This script requires Python 3.8.0+ to be installed on your system."
+    ],
+    "description": [
+        "This script extracts nested rar archives from downloaded files."
+    ],
+    "options": [
+        {
+            "name": "UnrarPath",
+            "displayName": "UnrarPath",
+            "value": "unrar",
+            "description": [
+                "Full Path to Unrar executable (optional, default: unrar).",
+                "(if blank, NZBGet \"UnrarCmd\" setting is used)"
+            ],
+            "select": []
+        },
+        {
+            "name": "WaitTime",
+            "displayName": "WaitTime",
+            "value": 0,
+            "description": [
+                "Time (in seconds) to pause start of script (default: 0).",
+                "(Gives NZBGet time to perform \"UnpackCleanupDisk\" action on slow systems)."
+            ],
+            "select": []
+        },
+        {
+            "name": "DeleteLeftover",
+            "displayName": "DeleteLeftover",
+            "value": "yes",
+            "description": [
+                "Delete leftover rar files after successful extract."
+            ],
+            "select": ["yes", "no"]
+        }
+    ],
+    "commands": [],
+    "taskTime": ""
+}

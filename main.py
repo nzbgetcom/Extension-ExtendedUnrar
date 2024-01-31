@@ -20,36 +20,6 @@
 #
 
 
-##############################################################################
-### NZBGET POST-PROCESSING SCRIPT                                          ###
-
-# Unrar nested rar files
-#
-# This script extracts nested rar archives from downloaded files.
-#
-# NOTE: This script requires Python to be installed on your system.
-
-##############################################################################
-### OPTIONS                                                                ###
-
-# Full Path to Unrar executable (optional, default: unrar)
-#
-# (if blank, NZBGet "UnrarCmd" setting is used)
-#UnrarPath=unrar
-
-# Time (in seconds) to pause start of script (default: 0)
-#
-# (Gives NZBGet time to perform "UnpackCleanupDisk" action on slow systems)
-#WaitTime=0
-
-# Delete leftover extended rar files after successful extract (yes, no).
-#
-#DeleteLeftover=yes
-
-### NZBGET POST-PROCESSING SCRIPT                                          ###
-##############################################################################
-
-
 import os
 import sys
 import subprocess
