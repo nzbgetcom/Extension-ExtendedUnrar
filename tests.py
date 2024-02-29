@@ -28,8 +28,7 @@ SUCCESS=93
 NONE=95
 ERROR=94
 
-#unrar = os.environ.get('unrar', 'unrar')
-unrar='UnRAR.exe'
+unrar = os.environ.get('unrar', 'unrar')
 
 root = dirname(__file__)
 test_data_dir = root + '/test_data/'
