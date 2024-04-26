@@ -90,13 +90,18 @@ extract = 0
 extracted = []
 working_dir = os.environ['NZBPP_DIRECTORY']
 
-def unrar_recursively():
+def unrar_recursively(dir):
     global extract
     global status
 
-    for dirpath, _, filenames in os.walk(working_dir):
-        paths = map(lambda filename: get_full_path(dirpath, filename), filenames)
+    print('[DETAIL] Scanning directory: %s' % dir)
+ 
+    for dirpath, subdirs, filenames in os.walk(dir):
+        paths = list(map(lambda filename: get_full_path(dirpath, filename), filenames))
         rars = [file for file in paths if if_rar(file) and file not in extracted]
+
+        for subdir in subdirs:
+            unrar_recursively(os.path.join(dir, subdir))
 
         if len(rars) == 0:
             extract = 1
@@ -106,8 +111,8 @@ def unrar_recursively():
             print('[INFO] Extracting %s' % file)
             sys.stdout.flush()
             # You can adjust the unrar options here if you need.  The defaults are:
-             # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
-            unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
+            # -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
+            unrar = unrarpath + ' -idp -ai -o- "' + file + '" "' + dir + '"'
             try:
                 retcode = subprocess.call(unrar, shell=True)
                 if retcode == 0 or retcode == 10:
@@ -123,10 +128,8 @@ def unrar_recursively():
                 print('[ERROR] Unable to extract %s' % file)
                 status = 1
                 return
-    unrar_recursively()
-                    
         
-unrar_recursively()
+unrar_recursively(working_dir)
 
 sys.stdout.flush()
 
