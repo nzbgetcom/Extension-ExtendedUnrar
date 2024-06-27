@@ -32,8 +32,8 @@ ERROR = 94
 unrar = os.environ.get("unrar", "unrar")
 
 root = dirname(__file__)
-test_data_dir = root + "/test_data/"
-tmp_dir = root + "/tmp/"
+test_data_dir = root + "./test_data/"
+tmp_dir = root + "./tmp/"
 test_rars = ["test1.rar", "test2.rar", "test3.rar"]
 result_files = [tmp_dir + "test1.txt", tmp_dir + "test2.txt", tmp_dir + "test3.txt"]
 
