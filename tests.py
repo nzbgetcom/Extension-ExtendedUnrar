@@ -102,7 +102,9 @@ class Tests(unittest.TestCase):
         set_defaults_env()
         for rar in test_rars:
             shutil.copyfile(test_data_dir + rar, tmp_dir + rar)
-        [_, code, _] = run_script()
+        [out, code, err] = run_script()
+        print("Output: ", out)
+        print("Error: ", err)
         self.assertEqual(code, SUCCESS)
 
         for file in result_files:
