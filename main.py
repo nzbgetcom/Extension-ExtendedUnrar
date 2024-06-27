@@ -132,7 +132,7 @@ def unrar_recursively():
             # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
             unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
             try:
-                retcode = subprocess.call(unrar)
+                retcode = subprocess.call(unrar, shell=True)
                 if retcode == 0 or retcode == 10:
                     print("[INFO] Extract Successful")
                     extracted.append(file)
