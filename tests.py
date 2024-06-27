@@ -29,7 +29,7 @@ SUCCESS = 93
 NONE = 95
 ERROR = 94
 
-unrar = os.environ.get('unrar', 'unrar')
+unrar = os.environ.get("unrar", "unrar")
 
 root = dirname(__file__)
 test_data_dir = root + "/test_data/"
@@ -95,6 +95,9 @@ def set_defaults_env():
 class Tests(unittest.TestCase):
 
     def test_unrar(self):
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
         os.mkdir(tmp_dir)
         set_defaults_env()
         for rar in test_rars:
