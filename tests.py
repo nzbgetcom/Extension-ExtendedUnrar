@@ -19,19 +19,17 @@
 import sys
 from os.path import dirname
 import os
-import sys
 import subprocess
 import unittest
 import shutil
 import json
 
-sys.stdout.reconfigure(encoding="utf-8")
 
 SUCCESS = 93
 NONE = 95
 ERROR = 94
 
-unrar = "../UnRAR.exe"
+unrar = os.environ.get('unrar', 'unrar')
 
 root = dirname(__file__)
 test_data_dir = root + "/test_data/"
