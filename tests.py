@@ -29,7 +29,7 @@ SUCCESS = 93
 NONE = 95
 ERROR = 94
 
-unrar = os.environ["unrar"]
+unrar = os.environ.get("unrar", "unrar")
 
 root = dirname(__file__)
 test_data_dir = root + "/test_data/"
@@ -64,7 +64,7 @@ def run_script():
     return (out.decode(), int(ret_code), err.decode())
 
 
-def set_defaults_env():
+def set_default_env():
     # NZBGet global options
     os.environ["NZBNA_EVENT"] = "FILE_DOWNLOADED"
     os.environ["NZBPP_DIRECTORY"] = tmp_dir
@@ -99,9 +99,11 @@ class Tests(unittest.TestCase):
             shutil.rmtree(tmp_dir)
 
         os.mkdir(tmp_dir)
-        set_defaults_env()
+        set_default_env()
+
         for rar in test_rars:
             shutil.copyfile(test_data_dir + rar, tmp_dir + rar)
+
         [out, code, err] = run_script()
         print("Output: ", out)
         print("Error: ", err)
