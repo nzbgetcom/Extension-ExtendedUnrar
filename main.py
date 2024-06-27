@@ -8,12 +8,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -26,69 +26,91 @@ import subprocess
 import time
 
 # Exit codes used by NZBGet
-POSTPROCESS_SUCCESS=93
-POSTPROCESS_ERROR=94
-POSTPROCESS_NONE=95
+POSTPROCESS_SUCCESS = 93
+POSTPROCESS_ERROR = 94
+POSTPROCESS_NONE = 95
+
+sys.stdout.reconfigure(encoding="utf-8")
 
 # Check if the script is called from nzbget 18.0 or later
-if not 'NZBOP_EXTENSIONS' in os.environ:
-    print('[ERROR] This script requires NZBGet v18.0 or later')
+if not "NZBOP_EXTENSIONS" in os.environ:
+    print("[ERROR] This script requires NZBGet v18.0 or later")
     sys.exit(POSTPROCESS_ERROR)
 
-print('[INFO] Script successfully started - python ' + str(sys.version_info))
+print("[INFO] Script successfully started - python " + str(sys.version_info))
 sys.stdout.flush()
 
 # Check nzbget.conf options
-required_options = ('NZBOP_UNRARCMD', 'NZBPO_UNRARPATH', 'NZBPO_WAITTIME', 'NZBPO_DELETELEFTOVER')
+required_options = (
+    "NZBOP_UNRARCMD",
+    "NZBPO_UNRARPATH",
+    "NZBPO_WAITTIME",
+    "NZBPO_DELETELEFTOVER",
+)
 for optname in required_options:
-    if (not optname in os.environ):
-        print('[ERROR] Option %s is missing in NZBGet configuration. Please check script settings' % optname[6:])
+    if not optname in os.environ:
+        print(
+            "[ERROR] Option %s is missing in NZBGet configuration. Please check script settings"
+            % optname[6:]
+        )
         sys.exit(POSTPROCESS_ERROR)
 
 # If NZBGet Unpack setting isn't enabled, this script cannot work properly
-if os.environ['NZBOP_UNPACK'] != 'yes':
+if os.environ["NZBOP_UNPACK"] != "yes":
     print('[ERROR] You must enable option "Unpack" in NZBGet configuration, exiting')
     sys.exit(POSTPROCESS_ERROR)
 
-unrarpath=os.environ['NZBPO_UNRARPATH']
-waittime=os.environ['NZBPO_WAITTIME']
-deleteleftover=os.environ['NZBPO_DELETELEFTOVER']
+unrarpath = os.environ["NZBPO_UNRARPATH"]
+waittime = os.environ["NZBPO_WAITTIME"]
+deleteleftover = os.environ["NZBPO_DELETELEFTOVER"]
 
-if unrarpath == '':
-   print('[DETAIL] UnrarPath setting is blank. Using default NZBGet UnrarCmd setting')
-   unrarpath=os.environ['NZBOP_UNRARCMD']
+if unrarpath == "":
+    print("[DETAIL] UnrarPath setting is blank. Using default NZBGet UnrarCmd setting")
+    unrarpath = os.environ["NZBOP_UNRARCMD"]
 
 # Check TOTALSTATUS
-if os.environ['NZBPP_TOTALSTATUS'] != 'SUCCESS':
-    print('[WARNING] NZBGet download TOTALSTATUS is not SUCCESS, exiting')
+if os.environ["NZBPP_TOTALSTATUS"] != "SUCCESS":
+    print("[WARNING] NZBGet download TOTALSTATUS is not SUCCESS, exiting")
     sys.exit(POSTPROCESS_NONE)
 
 # Check if destination directory exists (important for reprocessing of history items)
-if not os.path.isdir(os.environ['NZBPP_DIRECTORY']):
-    print('[WARNING] Destination directory ' + os.environ['NZBPP_DIRECTORY'] + ' does not exist, exiting')
+if not os.path.isdir(os.environ["NZBPP_DIRECTORY"]):
+    print(
+        "[WARNING] Destination directory "
+        + os.environ["NZBPP_DIRECTORY"]
+        + " does not exist, exiting"
+    )
     sys.exit(POSTPROCESS_NONE)
 
 # Sleep (maybe)
-if os.environ['NZBOP_UNPACKCLEANUPDISK'] == 'yes':
-    print('[DETAIL] Sleeping ' + waittime + ' seconds to give NZBGet time to finish UnpackCleanupDisk action')
+if os.environ["NZBOP_UNPACKCLEANUPDISK"] == "yes":
+    print(
+        "[DETAIL] Sleeping "
+        + waittime
+        + " seconds to give NZBGet time to finish UnpackCleanupDisk action"
+    )
     time.sleep(int(float(waittime)))
 
 # Traverse download files to check for un-extracted rar files
-print('[DETAIL] Searching for rar/RAR files')
+print("[DETAIL] Searching for rar/RAR files")
 
 sys.stdout.flush()
+
 
 def get_full_path(dir, filename):
     return os.path.join(dir, filename)
 
+
 def if_rar(filePath):
     _, fileExtension = os.path.splitext(filePath)
-    return fileExtension in ['.rar', '.RAR']
+    return fileExtension in [".rar", ".RAR"]
+
 
 status = 0
 extract = 0
 extracted = []
-working_dir = os.environ['NZBPP_DIRECTORY']
+working_dir = os.environ["NZBPP_DIRECTORY"]
+
 
 def unrar_recursively():
     global extract
@@ -101,44 +123,44 @@ def unrar_recursively():
         if len(rars) == 0:
             extract = 1
             return
-    
+
         for file in rars:
-            print('[INFO] Extracting %s' % file)
+            print("[INFO] Extracting %s" % file)
             sys.stdout.flush()
             # You can adjust the unrar options here if you need.  The defaults are:
-             # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
+            # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
             unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
             try:
-                retcode = subprocess.call(unrar, shell=True)
+                retcode = subprocess.call(unrar)
                 if retcode == 0 or retcode == 10:
-                    print('[INFO] Extract Successful')
+                    print("[INFO] Extract Successful")
                     extracted.append(file)
                     extract = 1
                 else:
-                    print('[ERROR] Extract failed, Returncode %d' % retcode)
+                    print("[ERROR] Extract failed, Returncode %d" % retcode)
                     status = 1
                     return
             except OSError as e:
-                print('[ERROR] Execution of unrar command failed: %s' % e)
-                print('[ERROR] Unable to extract %s' % file)
+                print("[ERROR] Execution of unrar command failed: %s" % e)
+                print("[ERROR] Unable to extract %s" % file)
                 status = 1
                 return
     unrar_recursively()
-                    
-        
+
+
 unrar_recursively()
 
 sys.stdout.flush()
 
-if extract == 1 and deleteleftover == 'yes':
-    print('[INFO] Deleting leftover rar files')
+if extract == 1 and deleteleftover == "yes":
+    print("[INFO] Deleting leftover rar files")
     for file in extracted:
-        print('[INFO] Deleting %s' % file)
+        print("[INFO] Deleting %s" % file)
         try:
             os.remove(file)
         except OSError as e:
-            print('[ERROR] Delete failed: %s' % e)
-            print('[ERROR] Unable to delete %s' % file)
+            print("[ERROR] Delete failed: %s" % e)
+            print("[ERROR] Unable to delete %s" % file)
             status = 1
 
 if status == 0:
