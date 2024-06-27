@@ -104,9 +104,7 @@ class Tests(unittest.TestCase):
         for rar in test_rars:
             shutil.copyfile(test_data_dir + rar, tmp_dir + rar)
 
-        [out, code, err] = run_script()
-        print("Output: ", out)
-        print("Error: ", err)
+        [_, code, _] = run_script()
         self.assertEqual(code, SUCCESS)
 
         for file in result_files:
