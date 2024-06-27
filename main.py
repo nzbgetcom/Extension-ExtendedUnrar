@@ -25,12 +25,13 @@ import sys
 import subprocess
 import time
 
+sys.stdout.reconfigure(encoding="utf-8")
+
 # Exit codes used by NZBGet
 POSTPROCESS_SUCCESS = 93
 POSTPROCESS_ERROR = 94
 POSTPROCESS_NONE = 95
 
-sys.stdout.reconfigure(encoding="utf-8")
 
 # Check if the script is called from nzbget 18.0 or later
 if not "NZBOP_EXTENSIONS" in os.environ:
