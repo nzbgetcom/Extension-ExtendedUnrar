@@ -19,6 +19,7 @@
 import sys
 from os.path import dirname
 import os
+import sys
 import subprocess
 import unittest
 import shutil
