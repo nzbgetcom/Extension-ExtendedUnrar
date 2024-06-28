@@ -37,7 +37,6 @@ tmp_dir = root + "/tmp/"
 test_rars = ["test1.rar", "test2.rar", "test3.rar"]
 result_files = [tmp_dir + "test1.txt", tmp_dir + "test2.txt", tmp_dir + "test3.txt"]
 
-
 host = "127.0.0.1"
 username = "TestUser"
 password = "TestPassword"
@@ -110,6 +109,23 @@ class Tests(unittest.TestCase):
         for file in result_files:
             self.assertTrue(os.path.exists(file))
 
+        shutil.rmtree(tmp_dir)
+
+    def test_multiple_folders(self):
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
+        os.mkdir(tmp_dir)
+        set_default_env()
+
+        for index, rar in enumerate(test_rars):
+            os.mkdir(str(f'{tmp_dir}{index}'))
+            shutil.copyfile(test_data_dir + rar, f'{tmp_dir}{index}/{rar}')
+        [_, code, _] = run_script()
+        self.assertEqual(code, SUCCESS)
+    
+        for file in result_files:
+            self.assertTrue(os.path.exists(file))
         shutil.rmtree(tmp_dir)
 
     def test_manifest(self):

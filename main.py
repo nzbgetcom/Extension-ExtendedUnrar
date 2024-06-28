@@ -116,41 +116,40 @@ working_dir = os.environ["NZBPP_DIRECTORY"]
 def unrar_recursively():
     global extract
     global status
-
+    
+    rars = list()
     for dirpath, _, filenames in os.walk(working_dir):
         paths = map(lambda filename: get_full_path(dirpath, filename), filenames)
-        rars = [file for file in paths if if_rar(file) and file not in extracted]
+        found_files = [file for file in paths if if_rar(file) and file not in extracted]
+        rars.extend(found_files)
 
-        if len(rars) == 0:
-            extract = 1
-            return
+    if len(rars) == 0:
+        extract = 1
+        return 
 
-        for file in rars:
-            print("[INFO] Extracting %s" % file)
-            sys.stdout.flush()
-            # You can adjust the unrar options here if you need.  The defaults are:
-            # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
-            unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
-            try:
-                retcode = subprocess.call(unrar, shell=True)
-                if retcode == 0 or retcode == 10:
-                    print("[INFO] Extract Successful")
-                    extracted.append(file)
-                    extract = 1
-                else:
-                    print("[ERROR] Extract failed, Returncode %d" % retcode)
-                    status = 1
-                    return
-            except OSError as e:
-                print("[ERROR] Execution of unrar command failed: %s" % e)
-                print("[ERROR] Unable to extract %s" % file)
+    for file in rars:
+        print("[INFO] Extracting %s" % file)
+        sys.stdout.flush()
+        # You can adjust the unrar options here if you need.  The defaults are:
+        # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
+        unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
+        try:
+            retcode = subprocess.call(unrar, shell=True)
+            if retcode == 0 or retcode == 10:
+                print("[INFO] Extract Successful")
+                extracted.append(file)
+                extract = 1
+            else:
+                print("[ERROR] Extract failed, Returncode %d" % retcode)
                 status = 1
                 return
+        except OSError as e:
+            print("[ERROR] Execution of unrar command failed: %s" % e)
+            print("[ERROR] Unable to extract %s" % file)
+            status = 1
+            return
     unrar_recursively()
-
-
 unrar_recursively()
-
 sys.stdout.flush()
 
 if extract == 1 and deleteleftover == "yes":
