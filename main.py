@@ -104,7 +104,7 @@ def get_full_path(dir, filename):
     return os.path.join(dir, filename)
 
 
-def if_rar(filePath):
+def is_rar(filePath):
     _, fileExtension = os.path.splitext(filePath)
     return re.match(r"\.rar|\.r\d{2,3}$", fileExtension, re.IGNORECASE) is not None
 
@@ -122,7 +122,7 @@ def unrar_recursively():
     rars = list()
     for dirpath, _, filenames in os.walk(working_dir):
         paths = map(lambda filename: get_full_path(dirpath, filename), filenames)
-        found_files = [file for file in paths if if_rar(file) and file not in extracted]
+        found_files = [file for file in paths if is_rar(file) and file not in extracted]
         rars.extend(found_files)
 
     if len(rars) == 0:

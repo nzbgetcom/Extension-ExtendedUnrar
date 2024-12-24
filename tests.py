@@ -41,6 +41,7 @@ result_files = [tmp_dir + "/test1.txt", tmp_dir + "/test2.txt", tmp_dir + "/test
 test_partitioned_rars = ["test4.r01", "test4.r02", "test4.r03"]
 test_rars = ["test1.rar", "test2.rar", "test3.rar"]
 test_partitioned_result_files = ["test4.bin"]
+test_partitioned_result_files = [tmp_dir + "/test4.bin"]
 
 host = "127.0.0.1"
 username = "TestUser"
@@ -162,8 +163,10 @@ class Tests(unittest.TestCase):
         os.environ["NZBPO_DELETELEFTOVER"] = "yes"
 
         for rar in test_partitioned_rars:
-            shutil.copyfile(test_data_dir + rar, f"{tmp_dir}{rar}")
+            shutil.copyfile(f"{test_data_dir}/{rar}", f"{tmp_dir}/{rar}")
+
         [_, code, _] = run_script()
+
         self.assertEqual(code, SUCCESS)
 
         for file in test_partitioned_rars:
