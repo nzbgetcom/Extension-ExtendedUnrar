@@ -25,6 +25,7 @@ import os
 import sys
 import subprocess
 import time
+import re
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -105,7 +106,7 @@ def get_full_path(dir, filename):
 
 def if_rar(filePath):
     _, fileExtension = os.path.splitext(filePath)
-    return fileExtension in [".rar", ".RAR"]
+    return re.match(r"\.rar|\.r\d{2,3}$", fileExtension, re.IGNORECASE) is not None
 
 
 status = 0
