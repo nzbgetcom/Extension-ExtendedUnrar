@@ -17,12 +17,14 @@
     ],
     "options": [
         {
-            "name": "UnrarPath",
-            "displayName": "UnrarPath",
-            "value": "unrar",
+            "name": "UnrarCmd",
+            "displayName": "UnrarCmd",
+            "value": "unrar e -idp -ai -o-",
             "description": [
-                "Full Path to Unrar executable (optional, default: unrar).",
-                "(if blank, NZBGet \"UnrarCmd\" setting is used)"
+                "Full path to unrar executable.",
+                "If blank, NZBGet \"UnrarCmd\" setting is used.",
+                "",
+                "Default: unrar e -idp -ai -o-"
             ],
             "select": []
         },
@@ -31,8 +33,10 @@
             "displayName": "WaitTime",
             "value": 0,
             "description": [
-                "Time (in seconds) to pause start of script (default: 0).",
-                "(Gives NZBGet time to perform \"UnpackCleanupDisk\" action on slow systems)."
+                "Time (in seconds) to pause start of script.",
+                "(Gives NZBGet time to perform \"UnpackCleanupDisk\" action on slow systems).",
+                "",
+                "Default: 0"
             ],
             "select": []
         },
