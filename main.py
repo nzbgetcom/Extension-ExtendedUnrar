@@ -3,6 +3,7 @@
 # ExtendedUnrar post-processing script for NZBGet
 #
 # Copyright (C) 2014 thorli <thor78@gmx.at>
+# Copyright (C) 2024-2025 Denis <denis@nzbget.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,7 +45,7 @@ sys.stdout.flush()
 # Check nzbget.conf options
 required_options = (
     "NZBOP_UNRARCMD",
-    "NZBPO_UNRARPATH",
+    "NZBPO_UNRARCMD",
     "NZBPO_WAITTIME",
     "NZBPO_DELETELEFTOVER",
 )
@@ -61,13 +62,13 @@ if os.environ["NZBOP_UNPACK"] != "yes":
     print('[ERROR] You must enable option "Unpack" in NZBGet configuration, exiting')
     sys.exit(POSTPROCESS_ERROR)
 
-unrarpath = os.environ["NZBPO_UNRARPATH"]
+unrarcmd = os.environ["NZBPO_UNRARCMD"]
 waittime = os.environ["NZBPO_WAITTIME"]
 deleteleftover = os.environ["NZBPO_DELETELEFTOVER"]
 
-if unrarpath == "":
-    print("[DETAIL] UnrarPath setting is blank. Using default NZBGet UnrarCmd setting")
-    unrarpath = os.environ["NZBOP_UNRARCMD"]
+if unrarcmd == "":
+    print("[DETAIL] UnrarCmd setting is blank. Using default NZBGet UnrarCmd setting")
+    unrarcmd = os.environ["NZBOP_UNRARCMD"]
 
 # Check TOTALSTATUS
 if os.environ["NZBPP_TOTALSTATUS"] != "SUCCESS":
@@ -116,7 +117,7 @@ working_dir = os.environ["NZBPP_DIRECTORY"]
 def unrar_recursively():
     global extract
     global status
-    
+
     rars = list()
     for dirpath, _, filenames in os.walk(working_dir):
         paths = map(lambda filename: get_full_path(dirpath, filename), filenames)
@@ -125,16 +126,15 @@ def unrar_recursively():
 
     if len(rars) == 0:
         extract = 1
-        return 
+        return
 
     for file in rars:
         print("[INFO] Extracting %s" % file)
         sys.stdout.flush()
-        # You can adjust the unrar options here if you need.  The defaults are:
-        # e (extract without paths), -idp (no extract progress), -ai (ignore attributes), -o- (don't overwrite)
-        unrar = unrarpath + ' e -idp -ai -o- "' + file + '" "' + working_dir + '"'
+
+        cmd = unrarcmd + ' "' + file + '" "' + working_dir + '"'
         try:
-            retcode = subprocess.call(unrar, shell=True)
+            retcode = subprocess.call(cmd, shell=True)
             if retcode == 0 or retcode == 10:
                 print("[INFO] Extract Successful")
                 extracted.append(file)
@@ -148,8 +148,12 @@ def unrar_recursively():
             print("[ERROR] Unable to extract %s" % file)
             status = 1
             return
+
     unrar_recursively()
+
+
 unrar_recursively()
+
 sys.stdout.flush()
 
 if extract == 1 and deleteleftover == "yes":

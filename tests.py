@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2024 Denis <denis@nzbget.com>
+# Copyright (C) 2024-2025 Denis <denis@nzbget.com>
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by
@@ -30,12 +30,13 @@ NONE = 95
 ERROR = 94
 
 unrar = os.environ.get("unrar", "unrar")
+unrar_cmd = unrar + " e -idp -ai -o-"
 
 root = dirname(__file__)
-test_data_dir = root + "/test_data/"
-tmp_dir = root + "/tmp/"
+test_data_dir = root + "/test_data"
+tmp_dir = root + "/tmp"
 test_rars = ["test1.rar", "test2.rar", "test3.rar"]
-result_files = [tmp_dir + "test1.txt", tmp_dir + "test2.txt", tmp_dir + "test3.txt"]
+result_files = [tmp_dir + "/test1.txt", tmp_dir + "/test2.txt", tmp_dir + "/test3.txt"]
 
 host = "127.0.0.1"
 username = "TestUser"
@@ -84,8 +85,8 @@ def set_default_env():
     os.environ["NZBNA_NZBNAME"] = "TestNZB"
     os.environ["NZBPR_FAKEDETECTOR_SORTED"] = "yes"
     os.environ["NZBOP_TEMPDIR"] = tmp_dir
-    os.environ["NZBOP_UNRARCMD"] = unrar
-    os.environ["NZBPO_UNRARPATH"] = ""
+    os.environ["NZBOP_UNRARCMD"] = unrar_cmd
+    os.environ["NZBPO_UNRARCMD"] = unrar_cmd
     os.environ["NZBPO_WAITTIME"] = "0"
     os.environ["NZBPO_DELETELEFTOVER"] = "no"
     os.environ["NZBOP_UNPACKCLEANUPDISK"] = "no"
@@ -97,13 +98,30 @@ class Tests(unittest.TestCase):
         if os.path.exists(tmp_dir):
             shutil.rmtree(tmp_dir)
 
-        os.mkdir(tmp_dir)
         set_default_env()
 
-        for rar in test_rars:
-            shutil.copyfile(test_data_dir + rar, tmp_dir + rar)
+        shutil.copytree(test_data_dir, tmp_dir, dirs_exist_ok=True)
 
         [_, code, _] = run_script()
+
+        self.assertEqual(code, SUCCESS)
+
+        for file in result_files:
+            self.assertTrue(os.path.exists(file))
+
+        shutil.rmtree(tmp_dir)
+
+    def test_unrar_with_empty_unrarcmd_option(self):
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
+        set_default_env()
+        os.environ["NZBPO_UNRARCMD"] = ""
+
+        shutil.copytree(test_data_dir, tmp_dir, dirs_exist_ok=True)
+
+        [_, code, _] = run_script()
+
         self.assertEqual(code, SUCCESS)
 
         for file in result_files:
@@ -119,13 +137,15 @@ class Tests(unittest.TestCase):
         set_default_env()
 
         for index, rar in enumerate(test_rars):
-            os.mkdir(str(f'{tmp_dir}{index}'))
-            shutil.copyfile(test_data_dir + rar, f'{tmp_dir}{index}/{rar}')
+            os.mkdir(str(f"{tmp_dir}/{index}"))
+            shutil.copyfile(f"{test_data_dir}/{rar}", f"{tmp_dir}/{index}/{rar}")
         [_, code, _] = run_script()
+
         self.assertEqual(code, SUCCESS)
-    
+
         for file in result_files:
             self.assertTrue(os.path.exists(file))
+
         shutil.rmtree(tmp_dir)
 
     def test_manifest(self):
