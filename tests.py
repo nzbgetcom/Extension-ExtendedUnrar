@@ -33,10 +33,15 @@ unrar = os.environ.get("unrar", "unrar")
 unrar_cmd = unrar + " e -idp -ai -o-"
 
 root = dirname(__file__)
+
 test_data_dir = root + "/test_data"
 tmp_dir = root + "/tmp"
 test_rars = ["test1.rar", "test2.rar", "test3.rar"]
 result_files = [tmp_dir + "/test1.txt", tmp_dir + "/test2.txt", tmp_dir + "/test3.txt"]
+test_partitioned_rars = ["test4.r01", "test4.r02", "test4.r03"]
+test_rars = ["test1.rar", "test2.rar", "test3.rar"]
+test_partitioned_result_files = ["test4.bin"]
+test_partitioned_result_files = [tmp_dir + "/test4.bin"]
 
 host = "127.0.0.1"
 username = "TestUser"
@@ -139,6 +144,7 @@ class Tests(unittest.TestCase):
         for index, rar in enumerate(test_rars):
             os.mkdir(str(f"{tmp_dir}/{index}"))
             shutil.copyfile(f"{test_data_dir}/{rar}", f"{tmp_dir}/{index}/{rar}")
+
         [_, code, _] = run_script()
 
         self.assertEqual(code, SUCCESS)
@@ -146,6 +152,28 @@ class Tests(unittest.TestCase):
         for file in result_files:
             self.assertTrue(os.path.exists(file))
 
+        shutil.rmtree(tmp_dir)
+
+    def test_delete_leftovers(self):
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
+        os.mkdir(tmp_dir)
+        set_default_env()
+        os.environ["NZBPO_DELETELEFTOVER"] = "yes"
+
+        for rar in test_partitioned_rars:
+            shutil.copyfile(f"{test_data_dir}/{rar}", f"{tmp_dir}/{rar}")
+
+        [_, code, _] = run_script()
+
+        self.assertEqual(code, SUCCESS)
+
+        for file in test_partitioned_rars:
+            self.assertFalse(os.path.exists(file))
+
+        for file in test_partitioned_result_files:
+            self.assertTrue(os.path.exists(file))
         shutil.rmtree(tmp_dir)
 
     def test_manifest(self):
